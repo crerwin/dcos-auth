@@ -1,4 +1,4 @@
-// Copyright © 2018 NAME HERE <EMAIL ADDRESS>
+// Copyright © 2018 Justin Lee <EMAIL ADDRESS>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,10 @@
 package cmd
 
 import (
-
 	"fmt"
 	"os"
-//	homedir "github.com/mitchellh/go-homedir"
+
 	"github.com/spf13/cobra"
-//	"github.com/spf13/viper"
 )
 
 var privateKeyFile string
@@ -32,7 +30,6 @@ var rootCmd = &cobra.Command{
 	Use:   "dcos-auth",
 	Short: "Helper tool to authenticate against DC/OS Enterprise ACS",
 	Long:  `Helper tool to authenticate against DC/OS Enterprise ACS`,
-	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
 func Execute() {

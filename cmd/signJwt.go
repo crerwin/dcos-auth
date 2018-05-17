@@ -1,4 +1,4 @@
-// Copyright © 2018 NAME HERE <EMAIL ADDRESS>
+// Copyright © 2018 Justin Lee <EMAIL ADDRESS>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,12 +28,10 @@ import (
 var signJwtCmd = &cobra.Command{
 	Use:   "signJwt",
 	Short: "Sign a JWT token using a private key and uid",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long: `Sign a JWT token using a private RSA key and uid.
+	
+	Designed for Enterprise DC/OS, and outputs in format accepted by the
+/acs/api/v1/auth/login endpoint.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		
 		if privateKeyFile == "" || uid == "" {
@@ -60,20 +58,12 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			log.Fatal("Unable to generate token")
 		}
+
+		// Not sure if it's more efficient (spacewise) to do this or add the json package.
 		fmt.Println("{\"token\": \"" + tokenString + "\", \"uid\": \"" + uid + "\"}")
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(signJwtCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// signJwtCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// signJwtCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
