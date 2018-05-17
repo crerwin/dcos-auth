@@ -17,8 +17,8 @@ package cmd
 import (
 	"fmt"
 	"io/ioutil"
-	"time"
 	"log"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/spf13/cobra"
@@ -33,7 +33,7 @@ var signJwtCmd = &cobra.Command{
 	Designed for Enterprise DC/OS, and outputs in format accepted by the
 /acs/api/v1/auth/login endpoint.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		
+
 		if privateKeyFile == "" || uid == "" {
 			log.Fatal("Must provide at least a private key (-k) and a uid (-u)")
 		}
