@@ -2,23 +2,23 @@ package cmd
 
 import (
 	"bytes"
+	"crypto/tls"
+	"encoding/base64"
 	"encoding/json"
-	"time"
+	"errors"
 	"fmt"
 	"io/ioutil"
-	"net/http"
-	"crypto/tls"
-	"errors"
-	"encoding/base64"
-	"strings"
 	"log"
-	
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 )
 
 type serviceLoginObject struct {
 	Uid   string `json:"uid"`
-	Token	string `json:"token"`
+	Token string `json:"token"`
 }
 
 type loginResponse struct {
@@ -27,7 +27,7 @@ type loginResponse struct {
 
 type claimSet struct {
 	Uid string `json:"uid"`
-	Exp int `json:"exp"`
+	Exp int    `json:"exp"`
 	// *StandardClaims
 }
 
@@ -53,7 +53,7 @@ func checkExpired(tokenString string) (expired bool, err error) {
 	b64claims := strings.Split(tokenString, ".")[1]
 
 	claimsJson, err := base64.RawStdEncoding.DecodeString(b64claims)
-	
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -65,7 +65,7 @@ func checkExpired(tokenString string) (expired bool, err error) {
 		log.Fatal(err)
 	}
 
-	minValidTime := float64(time.Now().Add(time.Minute * time.Duration(remainTime)).Unix())
+	minValidTime := float64(time.Now().Add(time.Second * time.Duration(refreshThreshold)).Unix())
 
 	return float64(claims.Exp) < minValidTime, nil
 }
@@ -132,9 +132,9 @@ func generateServiceLoginToken(privateKey []byte, uid string, validTime int) (lo
 
 func generateServiceLoginObject(privateKey []byte, uid string, validTime int) (loginObject []byte, err error) {
 	token, err := generateServiceLoginToken(privateKey, uid, validTime)
-	
+
 	m := serviceLoginObject{
-		Uid: uid,
+		Uid:   uid,
 		Token: token,
 	}
 

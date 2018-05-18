@@ -33,7 +33,7 @@ import (
 var loginCmd = &cobra.Command{
 	Use:   "login",
 	Short: "Log in and generate Service Authentication Token",
-	Long: `Log in and generate Service Authentication Token`,
+	Long:  `Log in and generate Service Authentication Token`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 
@@ -51,7 +51,7 @@ var loginCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		
+
 		authToken, err := login(master, loginObject)
 
 		err = output([]byte(authToken))
@@ -64,6 +64,5 @@ var loginCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(loginCmd)
 }
-
 
 // func generateServiceLoginToken(privateKey byte[], uid string, validTime int) (jwt string, err error) {

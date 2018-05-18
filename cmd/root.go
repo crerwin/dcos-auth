@@ -24,9 +24,10 @@ import (
 var privateKeyFile string
 var uid string
 var validTime int
-var remainTime int
+var refreshThreshold int
 var master string
 var outputFile string
+
 // var outputenv string
 var tokenFile string
 
@@ -49,9 +50,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&uid, "uid", "u", "", "User Id")
 	rootCmd.PersistentFlags().StringVarP(&master, "master", "m", "master.mesos", "Master Hostname/IP")
 	rootCmd.PersistentFlags().StringVarP(&outputFile, "output", "o", "", "Output File (will default to stdout)")
-	// rootCmd.PersistentFlags().StringVarP(&tokenFile, "token", "r", "", "Token File to be refreshed")
-	// rootCmd.PersistentFlags().StringVarP(&outputenv, "env", "e", "", "Output Env Variable (only applies to login)")
 	rootCmd.PersistentFlags().IntVarP(&validTime, "time", "t", 10, "Token validity (in seconds)")
-	rootCmd.PersistentFlags().IntVarP(&remainTime, "remain", "T", 30, "Refresh if auth token has less than this many minutes left")
+	rootCmd.PersistentFlags().IntVarP(&refreshThreshold, "refreshThreshold", "r", 900, "Refresh if auth token has less than this many seconds left")
 
 }

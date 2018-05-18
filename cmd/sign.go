@@ -26,7 +26,7 @@ import (
 var genSLTCmd = &cobra.Command{
 	Use:   "genSLT",
 	Short: "Generate a Service Login Token",
-	Long: `Generate a Service Login Token, in JWT format`,
+	Long:  `Generate a Service Login Token, in JWT format`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 
@@ -43,7 +43,7 @@ var genSLTCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		
+
 		// fmt.Println(string(loginObject))
 		err = output([]byte(loginToken))
 		if err != nil {
@@ -55,7 +55,7 @@ var genSLTCmd = &cobra.Command{
 var genSLOCmd = &cobra.Command{
 	Use:   "genSLO",
 	Short: "Generate JSON-formatted Service Login Token",
-	Long: `Generate JSON-formatted Service Login Token, formatted for DC/OS ACS API`,
+	Long:  `Generate JSON-formatted Service Login Token, formatted for DC/OS ACS API`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 
@@ -72,7 +72,7 @@ var genSLOCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		
+
 		err = output(loginObject)
 		if err != nil {
 			log.Fatal(err)
@@ -84,6 +84,5 @@ func init() {
 	rootCmd.AddCommand(genSLTCmd)
 	rootCmd.AddCommand(genSLOCmd)
 }
-
 
 // func generateServiceLoginToken(privateKey byte[], uid string, validTime int) (jwt string, err error) {
