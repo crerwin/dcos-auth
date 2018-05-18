@@ -9,6 +9,9 @@ import (
 	"net/http"
 	"crypto/tls"
 	"errors"
+	"encoding/base64"
+	"strings"
+	"log"
 	
 	"github.com/dgrijalva/jwt-go"
 )
@@ -20,6 +23,12 @@ type serviceLoginObject struct {
 
 type loginResponse struct {
 	Token string `json:"token"`
+}
+
+type claimSet struct {
+	Uid string `json:"uid"`
+	Exp int `json:"exp"`
+	// *StandardClaims
 }
 
 type Cluster struct {
@@ -38,6 +47,27 @@ func createClient() *http.Client {
 	} // TODO: add timeouts here
 
 	return client
+}
+
+func checkExpired(tokenString string) (expired bool, err error) {
+	b64claims := strings.Split(tokenString, ".")[1]
+
+	claimsJson, err := base64.RawStdEncoding.DecodeString(b64claims)
+	
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var claims claimSet
+	err = json.Unmarshal(claimsJson, &claims)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	minValidTime := float64(time.Now().Add(time.Minute * time.Duration(remainTime)).Unix())
+
+	return float64(claims.Exp) < minValidTime, nil
 }
 
 func login(master string, loginObject []byte) (authToken string, err error) {
@@ -113,8 +143,8 @@ func generateServiceLoginObject(privateKey []byte, uid string, validTime int) (l
 
 func output(content []byte) (err error) {
 	err = nil
-	if outputfile != "" {
-		err = ioutil.WriteFile(outputfile, []byte(content), 0600)
+	if outputFile != "" {
+		err = ioutil.WriteFile(outputFile, []byte(content), 0600)
 	} else {
 		fmt.Println(string(content))
 	}
