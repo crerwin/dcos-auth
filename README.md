@@ -3,7 +3,7 @@ Use this script (Go binary) to generate a service authentication token from a se
 Can output to stdout or to a file.
 
 Usage:
-```
+```bash
 $ ./dcos-auth login -k priv.key -u sa -m 192.168.10.31
 eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1aWQiOiJzYSIsImV4cCI6MTUyNzA5MDA2OH0.YUG2zp9pnJE1TJHfdYqv0ExqxFKYcurL8B1VHDvNCFRQDlBH9N9v-0ohNB1PoVWZynWZt9QXAA2E_12OWUCpW6ghp4jAyVmABhcyxqpOf8jwP0CHYxyxcM2QZiKYlO7eIru8dsNVvXH9unsKv0iOTFTzJbUTqFAoSH82PMix30ORPRawwzOrkP0TJ3F0CTQFf_wWX5R1naZ2PJCaxpRmk11DnU5oTTJQSteCopBbiryN3lZJaAS9nmGoA_mULU5ysTcL95C4DwjQIpmqwM17xkvg0Iht-52SJz6Uq9rLS2JoA29whmRQ7YnGqZPnvQu4TjK0YH4CmtuZ8UDocoAWNw
 
@@ -12,4 +12,18 @@ $ cat token
 eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1aWQiOiJzYSIsImV4cCI6MTUyNzA5MDA3MH0.ZP1SAhV75DLYi-CcVfco-uv55HbfPSAis1SjYh-I1uN7lqwfN4w6gEbUaqc2452-DrucKkxv7W8ScsHip1UKwe2HlxYrQSAigT-ztSbGw-toxhQeuDOa086pifraCdNXeevjHdtno6kRfrXHewPDeukVqbmr2_uizwwy3Hq1-0diCq3RojZ-q5ljdTONCBpXPl9ElEdQipxrlrPdAljGf8e-COAmob0hGw4pCWCOWYLjoWq86jD0nKNkFtr80O47RIqYFbM6_mdHd_swTBlkdVn9nxWJS8Z0vLreDvjO-0kEFwRtR29YefMZMoOXD7hltJQOf7I8iR3A_3HIg-WMAw
 ```
 
+Can also 'refresh' a token; does basic validation to see if the token is expired (no other validation, yet), and will update it if it is.
+```bash
+# Does not update token if token has more than 15 minutes remaining, by default
+$ cat TOKEN; echo ""; go run main.go refresh -k priv.key -u sa -m 192.168.10.31 -o TOKEN; cat TOKEN; echo ""
+eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1aWQiOiJzYSIsImV4cCI6MTUyNzExMzQ5OX0.U8WrXsZl6sMfot8hMWSkYWf-m3aoY9_ef7ihZHrxCqis1ZZ7TJmjfLn3AwhoblTjjZ4ITGt-vUrrpxfs4pgy85Th6G1YRzcwOH87XE9j9LoGV5uHYkEsT74PiLoJWqoQlF6OlHi0c9vdLr7JIfWNovQXlQNyt5jkZHGHkF8TDMtGh1_4j_74cXjtFqKNZRq2xZTVxuntbnQ-gQLrvJWhrl4VtB4jh1DnkLwSt0l-TB2ch6cq8fBbD_BBdKGCNS63z5fyCryfJ0AeQ9UvzkGjSSU4kfvOp-BPcWapHgal42Z_x0_Xo67TJhDfT3dak9Ku3Qj3caoWC94A1azaOK8qPw
+eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1aWQiOiJzYSIsImV4cCI6MTUyNzExMzQ5OX0.U8WrXsZl6sMfot8hMWSkYWf-m3aoY9_ef7ihZHrxCqis1ZZ7TJmjfLn3AwhoblTjjZ4ITGt-vUrrpxfs4pgy85Th6G1YRzcwOH87XE9j9LoGV5uHYkEsT74PiLoJWqoQlF6OlHi0c9vdLr7JIfWNovQXlQNyt5jkZHGHkF8TDMtGh1_4j_74cXjtFqKNZRq2xZTVxuntbnQ-gQLrvJWhrl4VtB4jh1DnkLwSt0l-TB2ch6cq8fBbD_BBdKGCNS63z5fyCryfJ0AeQ9UvzkGjSSU4kfvOp-BPcWapHgal42Z_x0_Xo67TJhDfT3dak9Ku3Qj3caoWC94A1azaOK8qPw
+
+
+# Will refresh the token if it has less than specified 604800 seconds left (which it almost always will)
+$ cat TOKEN; echo ""; go run main.go refresh -k priv.key -u sa -m 192.168.10.31 -o TOKEN -r 604800; cat TOKEN; echo ""
+eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1aWQiOiJzYSIsImV4cCI6MTUyNzExMzQ5OX0.U8WrXsZl6sMfot8hMWSkYWf-m3aoY9_ef7ihZHrxCqis1ZZ7TJmjfLn3AwhoblTjjZ4ITGt-vUrrpxfs4pgy85Th6G1YRzcwOH87XE9j9LoGV5uHYkEsT74PiLoJWqoQlF6OlHi0c9vdLr7JIfWNovQXlQNyt5jkZHGHkF8TDMtGh1_4j_74cXjtFqKNZRq2xZTVxuntbnQ-gQLrvJWhrl4VtB4jh1DnkLwSt0l-TB2ch6cq8fBbD_BBdKGCNS63z5fyCryfJ0AeQ9UvzkGjSSU4kfvOp-BPcWapHgal42Z_x0_Xo67TJhDfT3dak9Ku3Qj3caoWC94A1azaOK8qPw
+eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1aWQiOiJzYSIsImV4cCI6MTUyNzExMzUxM30.ObsOVXmwDp-KBg32jDW2phGcY5_AJktyOg4TpqCzirT6lm4BM17-5CwtN3YpaNp_UKvvDaN-eGtW-1PXcjFIZwYaEl8U4lh0hgrK9i1vdQU-bxVVZvzAZrdZA9zkRjp8Fu0ahytUKLEq-ANcwkPapchLxQ4qMehbTroCmB4KKtkbfACQBbLZJoAIcBc9Iu2RPQglR3sSBEjJETR0XqVepsfleUVE9Z3nm-9u2ShTh2_6tqTGZNNhvvi6HjpkwPg5yxNbtuh09p4vO32eNwRkvIwwm6wEUt4OeumN3HooeFVUt4kCpzU-z-V2dOJ9ZMZ34lxrIBzZHT-SSSwkSPuTMA
+
+```
 Also has a handful of other helper methods, such as one to generate a service login token.
