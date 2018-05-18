@@ -24,6 +24,9 @@ import (
 var privateKeyFile string
 var uid string
 var validTime int
+var master string
+var outputfile string
+var outputenv string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -42,6 +45,9 @@ func Execute() {
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&privateKeyFile, "privatekeyfile", "k", "", "Private Key File")
 	rootCmd.PersistentFlags().StringVarP(&uid, "uid", "u", "", "User Id")
+	rootCmd.PersistentFlags().StringVarP(&master, "master", "m", "master.mesos", "Master Hostname/IP")
+	rootCmd.PersistentFlags().StringVarP(&outputfile, "output", "o", "", "Output File (will default to stdout)")
+	// rootCmd.PersistentFlags().StringVarP(&outputenv, "env", "e", "", "Output Env Variable (only applies to login)")
 	rootCmd.PersistentFlags().IntVarP(&validTime, "time", "t", 10, "Token validity (in seconds)")
 
 }
