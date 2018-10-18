@@ -1,4 +1,4 @@
-package cmd
+package dcosauth
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	jwt "github.com/dgrijalva/jwt-go"
 )
 
 type serviceLoginObject struct {
@@ -49,7 +49,7 @@ func createClient() *http.Client {
 	return client
 }
 
-func checkExpired(tokenString string) (expired bool, err error) {
+func CheckExpired(tokenString string, refreshThreshold int) (expired bool, err error) {
 	b64claims := strings.Split(tokenString, ".")[1]
 
 	claimsJson, err := base64.RawStdEncoding.DecodeString(b64claims)
@@ -70,7 +70,7 @@ func checkExpired(tokenString string) (expired bool, err error) {
 	return float64(claims.Exp) < minValidTime, nil
 }
 
-func login(master string, loginObject []byte) (authToken string, err error) {
+func Login(master string, loginObject []byte) (authToken string, err error) {
 
 	// Build client
 	client := createClient()
@@ -113,7 +113,7 @@ func login(master string, loginObject []byte) (authToken string, err error) {
 }
 
 // TODO: Add optional additional claims
-func generateServiceLoginToken(privateKey []byte, uid string, validTime int) (loginToken string, err error) {
+func GenerateServiceLoginToken(privateKey []byte, uid string, validTime int) (loginToken string, err error) {
 	// Parse the key
 	key, err := jwt.ParseRSAPrivateKeyFromPEM(privateKey)
 	if err != nil {
@@ -130,8 +130,8 @@ func generateServiceLoginToken(privateKey []byte, uid string, validTime int) (lo
 	return token.SignedString(key)
 }
 
-func generateServiceLoginObject(privateKey []byte, uid string, validTime int) (loginObject []byte, err error) {
-	token, err := generateServiceLoginToken(privateKey, uid, validTime)
+func GenerateServiceLoginObject(privateKey []byte, uid string, validTime int) (loginObject []byte, err error) {
+	token, err := GenerateServiceLoginToken(privateKey, uid, validTime)
 
 	m := serviceLoginObject{
 		Uid:   uid,
@@ -141,7 +141,7 @@ func generateServiceLoginObject(privateKey []byte, uid string, validTime int) (l
 	return json.Marshal(m)
 }
 
-func output(content []byte) (err error) {
+func Output(content []byte, outputFile string) (err error) {
 	err = nil
 	if outputFile != "" {
 		err = ioutil.WriteFile(outputFile, []byte(content), 0600)

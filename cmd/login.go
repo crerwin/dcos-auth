@@ -17,12 +17,11 @@ package cmd
 import (
 	// "bytes"
 	// "fmt"
-	"io/ioutil"
-	// "crypto/tls"
+	"io/ioutil" // "crypto/tls"
 	// "encoding/json"
-	"log"
-	// "net/http"
+	"log" // "net/http"
 
+	"github.com/dcos-labs/dcos-auth/pkg/dcosauth"
 	"github.com/spf13/cobra"
 )
 
@@ -47,14 +46,14 @@ var loginCmd = &cobra.Command{
 		}
 
 		// Returns a []byte
-		loginObject, err := generateServiceLoginObject(privateKey, uid, validTime)
+		loginObject, err := dcosauth.GenerateServiceLoginObject(privateKey, uid, validTime)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		authToken, err := login(master, loginObject)
+		authToken, err := dcosauth.Login(master, loginObject)
 
-		err = output([]byte(authToken))
+		err = dcosauth.Output([]byte(authToken), outputFile)
 		if err != nil {
 			log.Fatal(err)
 		}

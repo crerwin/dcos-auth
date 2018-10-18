@@ -19,6 +19,7 @@ import (
 	"io/ioutil"
 	"log"
 
+	"github.com/dcos-labs/dcos-auth/pkg/dcosauth"
 	"github.com/spf13/cobra"
 )
 
@@ -39,13 +40,13 @@ var genSLTCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		loginToken, err := generateServiceLoginToken(privateKey, uid, validTime)
+		loginToken, err := dcosauth.GenerateServiceLoginToken(privateKey, uid, validTime)
 		if err != nil {
 			log.Fatal(err)
 		}
 
 		// fmt.Println(string(loginObject))
-		err = output([]byte(loginToken))
+		err = dcosauth.Output([]byte(loginToken), outputFile)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -68,12 +69,12 @@ var genSLOCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		loginObject, err := generateServiceLoginObject(privateKey, uid, validTime)
+		loginObject, err := dcosauth.GenerateServiceLoginObject(privateKey, uid, validTime)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		err = output(loginObject)
+		err = dcosauth.Output(loginObject, outputFile)
 		if err != nil {
 			log.Fatal(err)
 		}
