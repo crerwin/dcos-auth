@@ -17,7 +17,7 @@ import (
 )
 
 type serviceLoginObject struct {
-	Uid   string `json:"uid"`
+	UID   string `json:"uid"`
 	Token string `json:"token"`
 }
 
@@ -26,14 +26,9 @@ type loginResponse struct {
 }
 
 type claimSet struct {
-	Uid string `json:"uid"`
+	UID string `json:"uid"`
 	Exp int    `json:"exp"`
 	// *StandardClaims
-}
-
-type Cluster struct {
-	cluster_url string
-	client      *http.Client
 }
 
 func createClient() *http.Client {
@@ -49,17 +44,18 @@ func createClient() *http.Client {
 	return client
 }
 
+// CheckExpired checks if a token will expire within the refreshThreshold
 func CheckExpired(tokenString string, refreshThreshold int) (expired bool, err error) {
 	b64claims := strings.Split(tokenString, ".")[1]
 
-	claimsJson, err := base64.RawStdEncoding.DecodeString(b64claims)
+	claimsJSON, err := base64.RawStdEncoding.DecodeString(b64claims)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	var claims claimSet
-	err = json.Unmarshal(claimsJson, &claims)
+	err = json.Unmarshal(claimsJSON, &claims)
 
 	if err != nil {
 		log.Fatal(err)
@@ -70,6 +66,7 @@ func CheckExpired(tokenString string, refreshThreshold int) (expired bool, err e
 	return float64(claims.Exp) < minValidTime, nil
 }
 
+// Login acquires and returns a new JWT token by authenticating to the DC/OS api with a uid and private key
 func Login(master string, loginObject []byte) (authToken string, err error) {
 
 	// Build client
@@ -112,7 +109,7 @@ func Login(master string, loginObject []byte) (authToken string, err error) {
 	return dat.Token, nil
 }
 
-// TODO: Add optional additional claims
+// GenerateServiceLoginToken generates a JWT login token
 func GenerateServiceLoginToken(privateKey []byte, uid string, validTime int) (loginToken string, err error) {
 	// Parse the key
 	key, err := jwt.ParseRSAPrivateKeyFromPEM(privateKey)
@@ -130,21 +127,23 @@ func GenerateServiceLoginToken(privateKey []byte, uid string, validTime int) (lo
 	return token.SignedString(key)
 }
 
+// GenerateServiceLoginObject returns a JSON object containing a uid and a token generated with GenerateServiceLoginToken
 func GenerateServiceLoginObject(privateKey []byte, uid string, validTime int) (loginObject []byte, err error) {
 	token, err := GenerateServiceLoginToken(privateKey, uid, validTime)
 
 	m := serviceLoginObject{
-		Uid:   uid,
+		UID:   uid,
 		Token: token,
 	}
 
 	return json.Marshal(m)
 }
 
-func Output(content []byte, outputFile string) (err error) {
+// Output writes given content to a given filepath
+func Output(content []byte, outputFilePath string) (err error) {
 	err = nil
-	if outputFile != "" {
-		err = ioutil.WriteFile(outputFile, []byte(content), 0600)
+	if outputFilePath != "" {
+		err = ioutil.WriteFile(outputFilePath, []byte(content), 0600)
 	} else {
 		fmt.Println(string(content))
 	}
