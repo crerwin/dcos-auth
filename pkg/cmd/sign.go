@@ -85,5 +85,3 @@ func init() {
 	rootCmd.AddCommand(genSLTCmd)
 	rootCmd.AddCommand(genSLOCmd)
 }
-
-// func generateServiceLoginToken(privateKey byte[], uid string, validTime int) (jwt string, err error) {

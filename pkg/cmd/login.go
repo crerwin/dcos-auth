@@ -15,19 +15,12 @@
 package cmd
 
 import (
-	// "bytes"
-	// "fmt"
-	"io/ioutil" // "crypto/tls"
-	// "encoding/json"
-	"log" // "net/http"
+	"io/ioutil"
+	"log"
 
 	"github.com/dcos-labs/dcos-auth/pkg/dcosauth"
 	"github.com/spf13/cobra"
 )
-
-// type loginResponse struct {
-// 	Token string `json:"token"`
-// }
 
 var loginCmd = &cobra.Command{
 	Use:   "login",
@@ -63,5 +56,3 @@ var loginCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(loginCmd)
 }
-
-// func generateServiceLoginToken(privateKey byte[], uid string, validTime int) (jwt string, err error) {
