@@ -12,6 +12,14 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
+// DCOSAuth is our main authorization object
+type DCOSAuth struct {
+	Master     string
+	token      string
+	UID        string
+	privateKey string
+}
+
 type serviceLoginObject struct {
 	UID   string `json:"uid"`
 	Token string `json:"token"`
@@ -26,6 +34,18 @@ type claimSet struct {
 	Exp int    `json:"exp"`
 	// *StandardClaims
 }
+
+func Create(master string, uid string, privateKey string) *DCOSAuth {
+	return &DCOSAuth{
+		Master:     master,
+		UID:        uid,
+		privateKey: privateKey,
+	}
+}
+
+// func (d *DCOSAuth) Token() (token string, err error) {
+// 	// return authToken, refreshed if needed
+// }
 
 // CheckExpired checks if a token will expire within the refreshThreshold
 func CheckExpired(tokenString string, refreshThreshold int) (expired bool, err error) {
@@ -50,11 +70,11 @@ func CheckExpired(tokenString string, refreshThreshold int) (expired bool, err e
 }
 
 // Login acquires and returns a new JWT token by authenticating to the DC/OS api with a uid and private key
-func Login(master string, loginObject []byte) (authToken string, err error) {
+func (d *DCOSAuth) Login(loginObject []byte) (authToken string, err error) {
 
 	// Build client
 	client := createClient()
-	return login(master, loginObject, client)
+	return login(d.Master, loginObject, client)
 }
 
 // GenerateServiceLoginToken generates a JWT login token

@@ -58,7 +58,9 @@ var refreshCmd = &cobra.Command{
 				log.Fatal(err)
 			}
 
-			authToken, err := dcosauth.Login(master, loginObject)
+			dcosauther := dcosauth.Create(master, uid, string(privateKey))
+
+			authToken, err := dcosauther.Login(loginObject)
 
 			err = dcosauth.Output([]byte(authToken), outputFile)
 			if err != nil {
