@@ -1,23 +1,20 @@
 package dcosauth
 
 import (
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
-	"strings"
-	"time"
-
-	jwt "github.com/dgrijalva/jwt-go"
+	"net/http"
 )
 
 // DCOSAuth is our main authorization object
 type DCOSAuth struct {
-	Master     string
-	token      string
-	UID        string
-	privateKey string
+	apiclient           *http.Client
+	Master              string
+	token               string
+	UID                 string
+	privateKey          string
+	ValidTime           int
+	ExpirationThreshold int
 }
 
 type serviceLoginObject struct {
@@ -35,76 +32,31 @@ type claimSet struct {
 	// *StandardClaims
 }
 
-func Create(master string, uid string, privateKey string) *DCOSAuth {
+// New returns a pointer to a new DCOSAuth object
+func New(master string, uid string, privateKey string) *DCOSAuth {
 	return &DCOSAuth{
-		Master:     master,
-		UID:        uid,
-		privateKey: privateKey,
+		apiclient:           createClient(),
+		Master:              master,
+		UID:                 uid,
+		privateKey:          privateKey,
+		ValidTime:           900,
+		ExpirationThreshold: 60,
 	}
 }
 
-// func (d *DCOSAuth) Token() (token string, err error) {
-// 	// return authToken, refreshed if needed
-// }
-
-// CheckExpired checks if a token will expire within the refreshThreshold
-func CheckExpired(tokenString string, refreshThreshold int) (expired bool, err error) {
-	b64claims := strings.Split(tokenString, ".")[1]
-
-	claimsJSON, err := base64.RawStdEncoding.DecodeString(b64claims)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var claims claimSet
-	err = json.Unmarshal(claimsJSON, &claims)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	minValidTime := float64(time.Now().Add(time.Second * time.Duration(refreshThreshold)).Unix())
-
-	return float64(claims.Exp) < minValidTime, nil
+// Token returns the current token if it hasn't expired, otherwise it acquires and returns a new token
+func (d *DCOSAuth) Token() (token string, err error) {
+	return d.token, nil
 }
 
 // Login acquires and returns a new JWT token by authenticating to the DC/OS api with a uid and private key
-func (d *DCOSAuth) Login(loginObject []byte) (authToken string, err error) {
+func (d *DCOSAuth) Login() (authToken string, err error) {
+
+	lo, _ := GenerateServiceLoginObject([]byte(d.privateKey), d.UID, d.ValidTime)
 
 	// Build client
 	client := createClient()
-	return login(d.Master, loginObject, client)
-}
-
-// GenerateServiceLoginToken generates a JWT login token
-func GenerateServiceLoginToken(privateKey []byte, uid string, validTime int) (loginToken string, err error) {
-	// Parse the key
-	key, err := jwt.ParseRSAPrivateKeyFromPEM(privateKey)
-	if err != nil {
-		return "", err
-	}
-
-	// Generate token
-	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"uid": uid,
-		"exp": time.Now().Add(time.Second * time.Duration(validTime)).Unix(),
-	})
-
-	// Sign with key and return
-	return token.SignedString(key)
-}
-
-// GenerateServiceLoginObject returns a JSON object containing a uid and a token generated with GenerateServiceLoginToken
-func GenerateServiceLoginObject(privateKey []byte, uid string, validTime int) (loginObject []byte, err error) {
-	token, err := GenerateServiceLoginToken(privateKey, uid, validTime)
-
-	m := serviceLoginObject{
-		UID:   uid,
-		Token: token,
-	}
-
-	return json.Marshal(m)
+	return login(d.Master, lo, client)
 }
 
 // Output writes given content to a given filepath

@@ -38,15 +38,9 @@ var loginCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		// Returns a []byte
-		loginObject, err := dcosauth.GenerateServiceLoginObject(privateKey, uid, validTime)
-		if err != nil {
-			log.Fatal(err)
-		}
+		dcosauther := dcosauth.New(master, uid, string(privateKey))
 
-		dcosauther := dcosauth.Create(master, uid, string(privateKey))
-
-		authToken, err := dcosauther.Login(loginObject)
+		authToken, err := dcosauther.Login()
 
 		err = dcosauth.Output([]byte(authToken), outputFile)
 		if err != nil {
