@@ -18,7 +18,7 @@ import (
 	"io/ioutil"
 	"log"
 
-	"github.com/dcos-labs/dcos-auth/pkg/dcosauth"
+	"github.com/crerwin/dcosauth/pkg/dcosauth"
 	"github.com/spf13/cobra"
 )
 
