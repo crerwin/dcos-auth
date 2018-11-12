@@ -10,7 +10,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-func CheckExpired(tokenString string, threshold int) (expired bool, err error) {
+func CheckExpired(tokenString string, threshold int) bool {
 	b64claims := strings.Split(tokenString, ".")[1]
 
 	claimsJSON, err := base64.RawStdEncoding.DecodeString(b64claims)
@@ -28,7 +28,7 @@ func CheckExpired(tokenString string, threshold int) (expired bool, err error) {
 
 	minValidTime := float64(time.Now().Add(time.Second * time.Duration(threshold)).Unix())
 
-	return float64(claims.Exp) < minValidTime, nil
+	return float64(claims.Exp) < minValidTime
 }
 
 func GenerateServiceLoginToken(privateKey []byte, uid string, validTime int) (loginToken string, err error) {
@@ -43,11 +43,8 @@ func GenerateServiceLoginToken(privateKey []byte, uid string, validTime int) (lo
 		"uid": uid,
 		"exp": time.Now().Add(time.Second * time.Duration(validTime)).Unix(),
 	})
-	log.Printf("GenerateServiceLoginToken token: %v", token)
 
 	// Sign with key and return
-	signedToken, _ := token.SignedString(key)
-	log.Printf("GenerateServiceLoginToken signed token: %v", signedToken)
 	return token.SignedString(key)
 }
 

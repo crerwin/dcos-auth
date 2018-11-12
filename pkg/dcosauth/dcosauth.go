@@ -46,17 +46,20 @@ func New(master string, uid string, privateKey string) *DCOSAuth {
 
 // Token returns the current token if it hasn't expired, otherwise it acquires and returns a new token
 func (d *DCOSAuth) Token() (token string, err error) {
+	if d.token == "" || CheckExpired(d.token, d.ExpirationThreshold) {
+		d.Login()
+	}
 	return d.token, nil
 }
 
 // Login acquires and returns a new JWT token by authenticating to the DC/OS api with a uid and private key
-func (d *DCOSAuth) Login() (authToken string, err error) {
+func (d *DCOSAuth) Login() {
 
 	lo, _ := GenerateServiceLoginObject([]byte(d.privateKey), d.UID, d.ValidTime)
 
 	// Build client
 	client := createClient()
-	return login(d.Master, lo, client)
+	d.token, _ = login(d.Master, lo, client)
 }
 
 // Output writes given content to a given filepath

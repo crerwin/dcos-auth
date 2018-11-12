@@ -40,10 +40,7 @@ var refreshCmd = &cobra.Command{
 			// File does not exist; let's write to it
 			refresh = true
 		} else {
-			refresh, err = dcosauth.CheckExpired(string(tokenString), refreshThreshold)
-			if err != nil {
-				log.Fatal(err)
-			}
+			refresh = dcosauth.CheckExpired(string(tokenString), refreshThreshold)
 		}
 
 		if refresh {
@@ -54,7 +51,7 @@ var refreshCmd = &cobra.Command{
 
 			dcosauther := dcosauth.New(master, uid, string(privateKey))
 
-			authToken, err := dcosauther.Login()
+			authToken, err := dcosauther.Token()
 
 			err = dcosauth.Output([]byte(authToken), outputFile)
 			if err != nil {

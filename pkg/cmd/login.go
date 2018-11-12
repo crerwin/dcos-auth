@@ -40,7 +40,7 @@ var loginCmd = &cobra.Command{
 
 		dcosauther := dcosauth.New(master, uid, string(privateKey))
 
-		authToken, err := dcosauther.Login()
+		authToken, err := dcosauther.Token()
 
 		err = dcosauth.Output([]byte(authToken), outputFile)
 		if err != nil {
