@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"io/ioutil"
 	"log"
 
 	"github.com/crerwin/dcosauth/pkg/dcosauth"
@@ -33,10 +32,7 @@ var loginCmd = &cobra.Command{
 			log.Fatal("Must provide at least a private key (-k) and a uid (-u)")
 		}
 
-		privateKey, err := ioutil.ReadFile(privateKeyFile)
-		if err != nil {
-			log.Fatal(err)
-		}
+		privateKey, err := dcosauth.Input(privateKeyFile)
 
 		dcosauther := dcosauth.New(master, uid, string(privateKey))
 

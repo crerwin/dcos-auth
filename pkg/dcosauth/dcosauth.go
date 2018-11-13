@@ -1,8 +1,6 @@
 package dcosauth
 
 import (
-	"fmt"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -60,16 +58,4 @@ func (d *DCOSAuth) Login() {
 	// Build client
 	client := createClient()
 	d.token, _ = login(d.Master, lo, client)
-}
-
-// Output writes given content to a given filepath
-func Output(content []byte, outputFilePath string) (err error) {
-	err = nil
-	if outputFilePath != "" {
-		err = ioutil.WriteFile(outputFilePath, []byte(content), 0600)
-	} else {
-		fmt.Println(string(content))
-	}
-
-	return err
 }
