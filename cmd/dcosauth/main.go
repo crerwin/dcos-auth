@@ -14,7 +14,7 @@
 
 package main
 
-import "github.com/justinrlee/dcos-auth/cmd"
+import "github.com/crerwin/dcosauth/pkg/cmd"
 
 func main() {
 	cmd.Execute()

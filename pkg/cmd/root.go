@@ -38,6 +38,7 @@ var rootCmd = &cobra.Command{
 	Long:  `Helper tool to authenticate against DC/OS Enterprise ACS`,
 }
 
+// Execute executes the dcos-auth cli command with flags
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
@@ -52,5 +53,4 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&outputFile, "output", "o", "", "Output File (will default to stdout)")
 	rootCmd.PersistentFlags().IntVarP(&validTime, "time", "t", 10, "Token validity (in seconds)")
 	rootCmd.PersistentFlags().IntVarP(&refreshThreshold, "refreshThreshold", "r", 900, "Refresh if auth token has less than this many seconds left")
-
 }

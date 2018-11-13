@@ -18,6 +18,7 @@ import (
 	"io/ioutil"
 	"log"
 
+	"github.com/crerwin/dcosauth/pkg/dcosauth"
 	"github.com/spf13/cobra"
 )
 
@@ -39,10 +40,7 @@ var refreshCmd = &cobra.Command{
 			// File does not exist; let's write to it
 			refresh = true
 		} else {
-			refresh, err = checkExpired(string(tokenString))
-			if err != nil {
-				log.Fatal(err)
-			}
+			refresh = dcosauth.CheckExpired(string(tokenString), refreshThreshold)
 		}
 
 		if refresh {
@@ -51,20 +49,15 @@ var refreshCmd = &cobra.Command{
 				log.Fatal(err)
 			}
 
-			// Returns a []byte
-			loginObject, err := generateServiceLoginObject(privateKey, uid, validTime)
-			if err != nil {
-				log.Fatal(err)
-			}
+			dcosauther := dcosauth.New(master, uid, string(privateKey))
 
-			authToken, err := login(master, loginObject)
+			authToken, err := dcosauther.Token()
 
-			err = output([]byte(authToken))
+			err = dcosauth.Output([]byte(authToken), outputFile)
 			if err != nil {
 				log.Fatal(err)
 			}
 		}
-
 	},
 }
 

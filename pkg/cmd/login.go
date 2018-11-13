@@ -15,20 +15,11 @@
 package cmd
 
 import (
-	// "bytes"
-	// "fmt"
-	"io/ioutil"
-	// "crypto/tls"
-	// "encoding/json"
 	"log"
-	// "net/http"
 
+	"github.com/crerwin/dcosauth/pkg/dcosauth"
 	"github.com/spf13/cobra"
 )
-
-// type loginResponse struct {
-// 	Token string `json:"token"`
-// }
 
 var loginCmd = &cobra.Command{
 	Use:   "login",
@@ -41,20 +32,13 @@ var loginCmd = &cobra.Command{
 			log.Fatal("Must provide at least a private key (-k) and a uid (-u)")
 		}
 
-		privateKey, err := ioutil.ReadFile(privateKeyFile)
-		if err != nil {
-			log.Fatal(err)
-		}
+		privateKey, err := dcosauth.Input(privateKeyFile)
 
-		// Returns a []byte
-		loginObject, err := generateServiceLoginObject(privateKey, uid, validTime)
-		if err != nil {
-			log.Fatal(err)
-		}
+		dcosauther := dcosauth.New(master, uid, string(privateKey))
 
-		authToken, err := login(master, loginObject)
+		authToken, err := dcosauther.Token()
 
-		err = output([]byte(authToken))
+		err = dcosauth.Output([]byte(authToken), outputFile)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -64,5 +48,3 @@ var loginCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(loginCmd)
 }
-
-// func generateServiceLoginToken(privateKey byte[], uid string, validTime int) (jwt string, err error) {
